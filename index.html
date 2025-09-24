@@ -1,4 +1,3 @@
-<!-- -->
 <html><head>
 	<meta charset="UTF-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=GBK">
@@ -9,15 +8,13 @@
 	<link rel="apple-touch-icon" href="icon.png">
 	<link href="https://fonts.googleapis.com/css?family=Noto+Sans&display=swap" rel="stylesheet">
 	<link rel="manifest" href="manifest.json">
-
-
 </head>
 
 <body>
 <p><br><br></p>	
 <div class="zhengti">
 	<div class="juzuo1">
-			V25051817 (Phạm Sơn Dương)
+			V25093477 (Iris Tran)
 	</div>
 	<div class="saomatishi juzhong" id="biaoti">
 		将二维码对准扫描器扫码进出场	
@@ -70,7 +67,6 @@
 					document.getElementById('neirong').innerHTML="<img class='true' src='./true.png'><div	class='truetxt'><p class='jinchang'>进场成功</p><p class='riqi' id='dateTime01'></p></div>";
 
 					setInterval(function () {
-					
 						  const dt = document.getElementById('dateTime01');
 						  if (dt) {
 							dt.innerHTML = (new Date()).format('yyyy-MM-dd hh:mm');
@@ -78,50 +74,66 @@
 						}, 1000);
 				}
 			</script>
-		<div id="dateTime3">00:00</div>
+		
+		<!-- Bộ đếm 12 tiếng -->
+<div id="dateTime3" style="font-size:44px; color:#00C853;"></div>
 <script>
-    // Lấy thời điểm bắt đầu từ localStorage hoặc tạo mới
-    let startTime = localStorage.getItem("startTime");
-    if (!startTime) {
-        startTime = Date.now();
-        localStorage.setItem("startTime", startTime);
+function updateTimer() {
+  const now = new Date();
+
+  // Ca ngày và ca đêm
+  const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 58, 0);
+  const nightStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 58, 0);
+
+  let start, end;
+
+  if (now >= dayStart && now < nightStart) {
+    // Trong ca ngày
+    start = dayStart;
+    end = nightStart;
+  } else {
+    // Trong ca đêm
+    if (now < dayStart) {
+      // Trước 07:58 sáng → ca đêm hôm trước
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 19, 58, 0);
+      end = dayStart;
     } else {
-        startTime = parseInt(startTime);
+      // Sau 19:58 → ca đêm hôm nay
+      start = nightStart;
+      end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 7, 58, 0);
     }
+  }
 
-    // Cập nhật hiển thị mỗi giây
-    setInterval(function () {
-        let diff = Math.floor((Date.now() - startTime) / 1000); // giây
-        let hrs = Math.floor(diff / 3600);
-        let mins = Math.floor((diff % 3600) / 60);
-        let secs = diff % 60;
+  // Số giây đã trôi qua từ mốc bắt đầu ca
+  let elapsed = Math.floor((now - start) / 1000);
 
-        // Nếu tới 12 giờ → reset
-        if (hrs >= 12) {
-            startTime = Date.now();
-            localStorage.setItem("startTime", startTime);
-            hrs = 0;
-            mins = 0;
-            secs = 0;
-        }
+  // Chu kỳ = thời gian ca hiện tại
+  const cycleSeconds = Math.floor((end - start) / 1000);
+  elapsed = elapsed % cycleSeconds;
 
-        if (hrs > 0) {
-            // Nếu có giờ → h:mm:ss
-            document.getElementById('dateTime3').innerHTML =
-                hrs + ':' +
-                (mins < 10 ? '0' : '') + mins + ':' +
-                (secs < 10 ? '0' : '') + secs;
-        } else {
-            // Nếu chưa tới 1 giờ → mm:ss
-            document.getElementById('dateTime3').innerHTML =
-                (mins < 10 ? '0' : '') + mins + ':' +
-                (secs < 10 ? '0' : '') + secs;
-        }
-    }, 1000);
+  // Chuyển giây thành hh:mm:ss
+  const hours = Math.floor(elapsed / 3600);
+  const minutes = Math.floor((elapsed % 3600) / 60);
+  const seconds = elapsed % 60;
+
+  // Hiển thị
+  let display;
+  if (hours > 0) {
+    display = String(hours).padStart(2,'0') + ':' +
+              String(minutes).padStart(2,'0') + ':' +
+              String(seconds).padStart(2,'0');
+  } else {
+    display = String(minutes).padStart(2,'0') + ':' +
+              String(seconds).padStart(2,'0');
+  }
+
+  document.getElementById("dateTime3").textContent = display;
+}
+
+// Chạy ngay khi load và cập nhật mỗi giây
+updateTimer();
+setInterval(updateTimer, 1000);
 </script>
-			
-
-			
 		</div>
 	</div>
 	
@@ -141,6 +153,4 @@
     });
   }
 </script>
-
-
 </body></html>
